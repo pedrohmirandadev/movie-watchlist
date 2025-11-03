@@ -47,31 +47,40 @@ export async function addMovie(movieData: MovieData) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  
+  console.log("[v0] addMovie - User check:", { hasUser: !!user, userId: user?.id })
+  
   if (!user) {
     throw new Error("Not authenticated")
   }
 
+  const movieInsertData = {
+    user_id: user.id,
+    imdb_id: movieData.imdbID,
+    title: movieData.Title,
+    director: movieData.Director,
+    imdb_rating: movieData.imdbRating,
+    poster: movieData.Poster,
+    year: movieData.Year,
+    plot: movieData.Plot,
+    actors: movieData.Actors,
+    watched: false,
+  }
+
+  console.log("[v0] addMovie - Inserting movie:", { title: movieData.Title, userId: user.id })
+
   const { data, error } = await supabase
     .from("movies")
-    .insert({
-      user_id: user.id,
-      imdb_id: movieData.imdbID,
-      title: movieData.Title,
-      director: movieData.Director,
-      imdb_rating: movieData.imdbRating,
-      poster: movieData.Poster,
-      year: movieData.Year,
-      plot: movieData.Plot,
-      actors: movieData.Actors,
-      watched: false,
-    })
+    .insert(movieInsertData)
     .select()
     .single()
 
   if (error) {
+    console.log("[v0] addMovie - Error:", error)
     throw error
   }
 
+  console.log("[v0] addMovie - Success:", { movieId: data.id })
   revalidatePath("/")
   return data
 }

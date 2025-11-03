@@ -40,7 +40,7 @@ export async function signIn(formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
@@ -49,8 +49,15 @@ export async function signIn(formData: FormData) {
     return { error: error.message }
   }
 
+  // Verificar se o usuário foi autenticado corretamente
+  if (!data.user || !data.session) {
+    return { error: "Failed to establish session" }
+  }
+
+  // Revalidar o cache
   revalidatePath("/", "layout")
-  redirect("/")
+
+  return { success: true }
 }
 
 export async function signOut() {
