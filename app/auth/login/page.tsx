@@ -21,16 +21,11 @@ export default function Page() {
 
     const result = await signIn(formData)
 
-    console.log("result", result)
     if (result?.error) {
       setError(result.error)
       setIsLoading(false)
     } else if (result?.success) {
-      console.log("[v0] Login successful, waiting before redirect...")
-      // Aguardar um pouco para garantir que os cookies sejam definidos
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log("[v0] Redirecting to home...")
-      // Usar window.location.href para forçar um reload completo
       window.location.href = "/"
     }
   }

@@ -47,9 +47,7 @@ export async function addMovie(movieData: MovieData) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  
-  console.log("[v0] addMovie - User check:", { hasUser: !!user, userId: user?.id })
-  
+    
   if (!user) {
     throw new Error("Not authenticated")
   }
@@ -67,8 +65,6 @@ export async function addMovie(movieData: MovieData) {
     watched: false,
   }
 
-  console.log("[v0] addMovie - Inserting movie:", { title: movieData.Title, userId: user.id })
-
   const { data, error } = await supabase
     .from("movies")
     .insert(movieInsertData)
@@ -76,11 +72,9 @@ export async function addMovie(movieData: MovieData) {
     .single()
 
   if (error) {
-    console.log("[v0] addMovie - Error:", error)
     throw error
   }
 
-  console.log("[v0] addMovie - Success:", { movieId: data.id })
   revalidatePath("/")
   return data
 }
@@ -95,7 +89,6 @@ export async function toggleWatched(movieId: string) {
     throw new Error("Not authenticated")
   }
 
-  // Get current watched status
   const { data: movie } = await supabase
     .from("movies")
     .select("watched")

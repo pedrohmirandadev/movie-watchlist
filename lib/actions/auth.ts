@@ -49,12 +49,10 @@ export async function signIn(formData: FormData) {
     return { error: error.message }
   }
 
-  // Verificar se o usuário foi autenticado corretamente
   if (!data.user || !data.session) {
     return { error: "Failed to establish session" }
   }
 
-  // Revalidar o cache
   revalidatePath("/", "layout")
 
   return { success: true }
